@@ -7,7 +7,7 @@
 /// - `std::collections::HashMap`
 ///
 /// - `indexmap::IndexMap` (Under `indexmap` flag)
-pub const trait Map<K, V> {
+pub const trait MapLike<K, V> {
     /// Insert a value using a key, return `Some(old_value)` if key already existed
     fn insert(&mut self, key: K, val: V) -> Option<V>;
     /// Get a value using the key
@@ -33,7 +33,7 @@ pub const trait Map<K, V> {
     }
 }
 /// A trait for maps that support indexing operations
-pub const trait IndexedMap<K, V>: Map<K, V> {
+pub const trait IndexedMap<K, V>: MapLike<K, V> {
     /// Index the key of a value, return the index at which the value was found
     fn index(&self, value: &V) -> Option<usize>
     where
@@ -44,7 +44,7 @@ pub const trait IndexedMap<K, V>: Map<K, V> {
     fn get_index_mut(&mut self, index: usize) -> Option<&mut V>;
 }
 #[cfg(feature = "std")]
-impl<K: core::hash::Hash + core::cmp::Ord, V: core::hash::Hash> Map<K, V>
+impl<K: core::hash::Hash + core::cmp::Ord, V: core::hash::Hash> MapLike<K, V>
     for std::collections::BTreeMap<K, V>
 {
     fn insert(&mut self, key: K, val: V) -> Option<V> {
@@ -85,7 +85,7 @@ impl<
     K: core::hash::Hash + core::cmp::Ord,
     V: core::hash::Hash,
     S: ::std::hash::BuildHasher,
-> Map<K, V> for std::collections::HashMap<K, V, S>
+> MapLike<K, V> for std::collections::HashMap<K, V, S>
 {
     fn insert(&mut self, key: K, val: V) -> Option<V> {
         self.insert(key, val)
