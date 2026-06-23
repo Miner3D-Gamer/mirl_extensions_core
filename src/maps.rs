@@ -25,7 +25,7 @@ pub const trait MapLike<K, V> {
     where
         V: PartialEq;
 
-    /// The equivilant of `len()`
+    /// The equivalent of `len()`
     fn len(&self) -> usize;
     /// Checks if the current list is empty
     fn is_empty(&self) -> bool {
@@ -81,11 +81,8 @@ impl<K: core::hash::Hash + core::cmp::Ord, V: core::hash::Hash> MapLike<K, V>
     }
 }
 #[cfg(feature = "std")]
-impl<
-    K: core::hash::Hash + core::cmp::Ord,
-    V: core::hash::Hash,
-    S: ::std::hash::BuildHasher,
-> MapLike<K, V> for std::collections::HashMap<K, V, S>
+impl<K: core::hash::Hash + core::cmp::Ord, V: core::hash::Hash, S: ::std::hash::BuildHasher>
+    MapLike<K, V> for std::collections::HashMap<K, V, S>
 {
     fn insert(&mut self, key: K, val: V) -> Option<V> {
         self.insert(key, val)
@@ -182,3 +179,4 @@ impl<
 //         }
 //     }
 // }
+// TODO: Add support for the other hashmap crates that are already in the dependencies

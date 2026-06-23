@@ -1,4 +1,4 @@
-use mirl_core::impl_empty_trait;
+use crate::impl_empty_trait;
 
 /// Implemented for types that support negative numbers
 pub trait SupportsNegative {}
@@ -16,17 +16,17 @@ pub trait SupportsRange32768 {}
 /// Numbers that support the number range 0-65535 (2^16)
 pub trait SupportsRange65536 {}
 
-mirl_core::impl_empty_trait!(SupportsDecimalRange0To1 for f16 ,f32 ,f64 ,f128);
+crate::impl_empty_trait!(SupportsDecimalRange0To1 for f16 ,f32 ,f64 ,f128);
 
-mirl_core::impl_empty_trait!(SupportsRange128 for u8, u16, u32, u64 ,u128 ,usize ,i8 ,i16 ,i32, i64, i128, isize ,f16 ,f32 ,f64 ,f128);
+crate::impl_empty_trait!(SupportsRange128 for u8, u16, u32, u64 ,u128 ,usize ,i8 ,i16 ,i32, i64, i128, isize ,f16 ,f32 ,f64 ,f128);
 
-mirl_core::impl_empty_trait!(SupportsRange256 for u8, u16, u32 ,u64 ,u128 ,usize, i16, i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
+crate::impl_empty_trait!(SupportsRange256 for u8, u16, u32 ,u64 ,u128 ,usize, i16, i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
 
-mirl_core::impl_empty_trait!(SupportsRange32768 for u16, u32 ,u64 ,u128 ,usize ,i16 ,i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
+crate::impl_empty_trait!(SupportsRange32768 for u16, u32 ,u64 ,u128 ,usize ,i16 ,i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
 
-mirl_core::impl_empty_trait!(SupportsRange65536 for u16, u32 ,u64 ,u128 ,usize, i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
+crate::impl_empty_trait!(SupportsRange65536 for u16, u32 ,u64 ,u128 ,usize, i32 ,i64 ,i128, isize, f16, f32, f64 ,f128);
 
 /// If a given struct is a number type, regardless
 pub trait IsNumberType {}
 
-mirl_core::impl_empty_trait!(IsNumberType for u8, u16, u32, u64 ,u128 ,usize ,i8 ,i16 ,i32, i64, i128, isize ,f16 ,f32 ,f64 ,f128);
+crate::impl_empty_trait!(IsNumberType for u8, u16, u32, u64 ,u128 ,usize ,i8 ,i16 ,i32, i64, i128, isize ,f16 ,f32 ,f64 ,f128);

@@ -15,7 +15,7 @@
 #![feature(const_cmp)]
 #![feature(const_destruct)]
 
-mod macro_fun;
+mod macros;
 
 mod maps;
 pub use maps::*;

@@ -131,7 +131,7 @@ impl<T> ListLike<T, usize> for Vec<T> {
         self.push_mut(value)
     }
     default fn try_remove(&mut self, index: usize) -> Option<T> {
-        mirl_core::misc::vec_try_remove(self, index)
+        mirl_std_exposed::vec::vec_try_remove(self, index)
     }
     default fn swap_values(&mut self, a: usize, b: usize) -> bool {
         if a > self.len() || b > self.len() {

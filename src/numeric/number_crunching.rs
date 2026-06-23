@@ -5,29 +5,20 @@ use crate::*;
 /// Convert the current value into [`core::cmp::Ordering`] if self is -1, 0, or 1
 pub const trait SignToOrdering {
     /// Convert the current value into [`core::cmp::Ordering`] if self is -1, 0, or 1
-    fn sign_to_ordering(&self) -> Option<core::cmp::Ordering>;
+    fn sign_to_ordering(&self) -> core::cmp::Ordering;
 }
 
-impl<T: ConstOne + ConstZero + ConstNegativeOne + core::cmp::PartialEq>
-    SignToOrdering for T
-{
-    fn sign_to_ordering(&self) -> Option<core::cmp::Ordering> {
+impl<T: core::cmp::PartialOrd + Zero> SignToOrdering for T {
+    #[inline(always)]
+    fn sign_to_ordering(&self) -> core::cmp::Ordering {
         use core::cmp::Ordering;
-        Some(if Self::NEGATIVE_ONE.eq(self) {
+        if Self::zero().lt(self) {
             Ordering::Greater
-        } else if Self::ZERO.eq(self) {
-            Ordering::Equal
-        } else if Self::ONE.eq(self) {
+        } else if Self::zero().gt(self) {
             Ordering::Less
         } else {
-            return None;
-        })
-        // Some(match self {
-        //     Self::NEGATIVE_ONE => Ordering::Less,
-        //     Self::ZERO => Ordering::Equal,
-        //     Self::ONE => Ordering::Greater,
-        //     _ => return None,
-        // })
+            Ordering::Equal
+        }
     }
 }
 
@@ -41,12 +32,14 @@ pub const trait SetOne {
     /// Set the current value to 1
     fn set_one(&mut self);
 }
-impl<T: ConstZero + [const] core::marker::Destruct> const SetZero for T {
+const impl<T: ConstZero + [const] core::marker::Destruct> SetZero for T {
+    #[inline(always)]
     fn set_zero(&mut self) {
         *self = Self::ZERO;
     }
 }
-impl<T: ConstOne + [const] core::marker::Destruct> const SetOne for T {
+const impl<T: ConstOne + [const] core::marker::Destruct> SetOne for T {
+    #[inline(always)]
     fn set_one(&mut self) {
         *self = Self::ONE;
     }
@@ -56,11 +49,10 @@ pub const trait IsZero {
     /// Check if the value is zero
     fn is_zero(&self) -> bool;
 }
-impl<T: [const] PartialEq + ConstZero + [const] core::marker::Destruct> const
-    IsZero for T
-{
+const impl<T: [const] PartialEq + [const] Zero + [const] core::marker::Destruct> IsZero for T {
+    #[inline(always)]
     fn is_zero(&self) -> bool {
-        Self::ZERO.eq(self)
+        Self::zero().eq(self)
     }
 }
 
@@ -72,6 +64,7 @@ pub const trait Sign {
 }
 
 impl<T: ConstNegativeOne + ConstZero + ConstOne + PartialOrd> Sign for T {
+    #[inline(always)]
     default fn sign(self) -> Self {
         if self > Self::ZERO {
             Self::ONE
@@ -87,6 +80,7 @@ macro_rules! impl_sign_u {
     ($($t:ty),*) => {
         // See those two spaces between the `const` and `Sign`?
         $(impl const  Sign for $t {
+            #[inline(always)]
             fn sign(self) -> Self {
                 if self > 0 { 1  }
                 else { 0  }

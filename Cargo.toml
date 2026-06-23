@@ -9,6 +9,7 @@ repository.workspace = true
 default = ["std"]
 #### Core
 std = []
+all = ["indexmap", "dashmap", "masstree", "bigint", "bigfloat"]
 
 # Compatibility with ffi
 c_compatible = []
@@ -19,31 +20,20 @@ indexmap = ["dep:indexmap", "std"]
 dashmap = ["dep:dashmap", "std"]
 masstree = ["dep:masstree", "std"]
 
-# Async
-tokio = ["dep:tokio"]
+# # Async
+# tokio = ["dep:tokio"]
 
-glfw = ["dep:glfw", "dep:gl", "std"]
+# glfw = ["dep:glfw", "dep:gl", "std"]
 
 bigint = ["dep:num-bigint", "dep:num-traits"]
 bigfloat = ["dep:num-bigfloat"]
 
-_checking = [
-    "indexmap",
-    "dashmap",
-    "masstree",
-    "tokio",
-    "glfw",
-    "bigint",
-    "bigfloat",
-]
+_checking = ["all"]
 [dependencies]
-mirl_core = { version = "0.0.0-alpha" }
+# mirl_core = { version = "0.0.0-alpha" }
+mirl_std_exposed = { version = "0.0.0-alpha" }
 
 # Crate support
-
-### GLFW
-glfw = { version = "0.51.0", optional = true }
-gl = { version = "0.14.0", optional = true }
 
 ### Like a HashMap but it remembers in what order elements were inserted
 indexmap = { version = "2.13.0", optional = true, default-features = false, features = [
@@ -56,8 +46,8 @@ dashmap = { version = ">=6.1.0", optional = true, default-features = false }
 ### A concurrent indexmap
 masstree = { version = "0.9.2", optional = true, default-features = false }
 
-### Concurrency
-tokio = { version = "1.50.0", optional = true, features = ["sync"] }
+# ### Concurrency
+# tokio = { version = "1.50.0", optional = true, features = ["sync"] }
 
 ### Number crates
 num-bigint = { version = "0.4.2", optional = true }

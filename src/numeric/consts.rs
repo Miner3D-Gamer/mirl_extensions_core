@@ -5,9 +5,8 @@ pub trait ConstNegativeOne {
     /// The value of -1 for the respective type
     const NEGATIVE_ONE: Self;
 }
-impl<
-    T: ConstOne + ConstZero + SupportsNegative + const core::ops::Sub<Output = T>,
-> ConstNegativeOne for T
+impl<T: ConstOne + ConstZero + SupportsNegative + const core::ops::Sub<Output = T>> ConstNegativeOne
+    for T
 {
     const NEGATIVE_ONE: Self = Self::ZERO - Self::ONE;
 }
@@ -87,50 +86,81 @@ pub const trait Zero {
     /// The value of 1 in the respective type
     fn zero() -> Self;
 }
-impl<T: ConstOne> const One for T {
+const impl<T: ConstOne> One for T {
     fn one() -> Self {
         Self::ONE
     }
 }
-impl<T: ConstZero> const Zero for T {
+const impl<T: ConstZero> Zero for T {
     fn zero() -> Self {
         Self::ZERO
     }
 }
 
-
 /// The upper and lower bound of a value
-pub const trait Bounded {
-    /// The minimal value this type can represent
-    const MIN: Self;
-    /// The maximum value this type can represent
-    const MAX: Self;
-}
+///
+/// Is automatically implemented for structs that implement [`LowerBounded`] and [`UpperBounded`]
+pub const trait Bounded: LowerBounded + UpperBounded {}
+const impl<T: [const] LowerBounded + [const] UpperBounded> Bounded for T {}
 
-macro_rules! bounded_impl {
+/// The smallest value the number can represent
+pub const trait LowerBounded {
+    /// The smallest value the number can represent
+    fn min_bound() -> Self;
+}
+/// The smallest value the number can represent
+pub const trait UpperBounded {
+    /// The smallest value the number can represent
+    fn max_bound() -> Self;
+}
+/// Impl the upper and lower bounds in const form
+#[macro_export]
+macro_rules! custom_type_bounded_impl_const {
     ($t:ty, $min:expr, $max:expr) => {
-        impl const Bounded for $t {
-            const MIN: Self = $min;
-            const MAX: Self = $max;
+        const impl LowerBounded for $t {
+            fn min_bound() -> Self {
+                $min
+            }
+        }
+        const impl UpperBounded for $t {
+            fn max_bound() -> Self {
+                $max
+            }
+        }
+    };
+}
+/// Impl the upper and lower bounds
+#[macro_export]
+macro_rules! custom_type_bounded_impl {
+    ($t:ty, $min:expr, $max:expr) => {
+        impl LowerBounded for $t {
+            fn min_bound() -> Self {
+                $min
+            }
+        }
+        impl UpperBounded for $t {
+            fn max_bound() -> Self {
+                $max
+            }
         }
     };
 }
 
-bounded_impl!(usize, usize::MIN, usize::MAX);
-bounded_impl!(u8, u8::MIN, u8::MAX);
-bounded_impl!(u16, u16::MIN, u16::MAX);
-bounded_impl!(u32, u32::MIN, u32::MAX);
-bounded_impl!(u64, u64::MIN, u64::MAX);
-bounded_impl!(u128, u128::MIN, u128::MAX);
+custom_type_bounded_impl_const!(usize, usize::MIN, usize::MAX);
+custom_type_bounded_impl_const!(u8, u8::MIN, u8::MAX);
+custom_type_bounded_impl_const!(u16, u16::MIN, u16::MAX);
+custom_type_bounded_impl_const!(u32, u32::MIN, u32::MAX);
+custom_type_bounded_impl_const!(u64, u64::MIN, u64::MAX);
+custom_type_bounded_impl_const!(u128, u128::MIN, u128::MAX);
 
-bounded_impl!(isize, isize::MIN, isize::MAX);
-bounded_impl!(i8, i8::MIN, i8::MAX);
-bounded_impl!(i16, i16::MIN, i16::MAX);
-bounded_impl!(i32, i32::MIN, i32::MAX);
-bounded_impl!(i64, i64::MIN, i64::MAX);
-bounded_impl!(i128, i128::MIN, i128::MAX);
+custom_type_bounded_impl_const!(isize, isize::MIN, isize::MAX);
+custom_type_bounded_impl_const!(i8, i8::MIN, i8::MAX);
+custom_type_bounded_impl_const!(i16, i16::MIN, i16::MAX);
+custom_type_bounded_impl_const!(i32, i32::MIN, i32::MAX);
+custom_type_bounded_impl_const!(i64, i64::MIN, i64::MAX);
+custom_type_bounded_impl_const!(i128, i128::MIN, i128::MAX);
 
-bounded_impl!(f32, f32::MIN, f32::MAX);
-bounded_impl!(f64, f64::MIN, f64::MAX);
-bounded_impl!(f128, f128::MIN, f128::MAX);
-bounded_impl!(f16, f16::MIN, f16::MAX);
+custom_type_bounded_impl_const!(f32, f32::MIN, f32::MAX);
+custom_type_bounded_impl_const!(f64, f64::MIN, f64::MAX);
+custom_type_bounded_impl_const!(f128, f128::MIN, f128::MAX);
+custom_type_bounded_impl_const!(f16, f16::MIN, f16::MAX);
