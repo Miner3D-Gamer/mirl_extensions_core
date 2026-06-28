@@ -2,30 +2,8 @@
 ///
 /// The required helper trait [`ListLikeHelper`] is automatically implemented for all structs that implement this trait
 pub const trait ListLike<T, Idx>:
-    core::ops::Index<Idx>
-    + core::ops::IndexMut<Idx>
-    + ListLikeHelper<T, Idx>
-    // + std::iter::Iterator
-    + std::iter::IntoIterator
+    core::ops::Index<Idx> + core::ops::IndexMut<Idx> + ListLikeHelper<T, Idx>
 {
-    /// The iterator for the list type
-    type Iterator<'a>: Iterator<Item = &'a T>
-    where
-        Self: 'a,
-        T: 'a;
-
-    /// Iter over the held items 
-    fn iter(&self) -> Self::Iterator<'_>;
-
-    /// The mutable iterator for the list type
-    type IteratorMut<'a>: Iterator<Item = &'a mut T>
-    where
-        Self: 'a,
-        T: 'a;
-
-    /// Iter over the held items mutably
-    fn iter_mut(&mut self) -> Self::IteratorMut<'_>;
-
     /// Get the internal value by reference without checking the bounds
     ///
     /// # Safety
@@ -59,10 +37,7 @@ pub const trait ListLike<T, Idx>:
     ///
     /// # Errors
     /// When it fails to allocate more which most often happens when the total length goes beyond [`isize::MAX`]
-    fn try_reserve(
-        &mut self,
-        amount: usize,
-    ) -> Result<(), std::collections::TryReserveError>;
+    fn try_reserve(&mut self, additional: usize) -> Result<(), std::collections::TryReserveError>;
     /// Returns the idx at which the given item was found
     fn find_position(&self, item: &T) -> Option<Idx>
     where
@@ -77,7 +52,55 @@ pub const trait ListLike<T, Idx>:
     }
     // fn iter<'a>(&'a self) -> &'a dyn core::iter::Iterator<Item = &T>;
 }
+/// Access a list like object
+pub const trait ListLikeAccess<T, Idx> {
+    /// Get a ref to T if the index is within the size of the vec
+    fn get(&self, index: Idx) -> Option<&T>;
+    /// Get a ref to T mutably if the index is within the size of the vec
+    fn get_mut(&mut self, index: Idx) -> Option<&mut T>;
+}
 
+const impl<List: [const] ListLike<T, Idx>, T, Idx> ListLikeAccess<T, Idx> for List
+where
+    Idx: [const] From<usize> + [const] core::marker::Destruct + [const] std::cmp::PartialOrd,
+{
+    default fn get(&self, index: Idx) -> Option<&T> {
+        if index > Idx::from(self.len()) {
+            None
+        } else {
+            Some(unsafe { self.get_unchecked(index) })
+        }
+    }
+    default fn get_mut(&mut self, index: Idx) -> Option<&mut T> {
+        if index > Idx::from(self.len()) {
+            None
+        } else {
+            Some(unsafe { self.get_unchecked_mut(index) })
+        }
+    }
+}
+/// Iterate over a [`ListLike`] object
+pub const trait ListLikeIter<T, Idx>: ListLike<T, Idx> {
+    /// The iterator for the list type
+    type Iterator<'a>: Iterator<Item = &'a T>
+    where
+        Self: 'a,
+        T: 'a;
+
+    /// Iter over the held items
+    fn iter(&self) -> Self::Iterator<'_>;
+}
+/// Iterate over a [`ListLike`] object mutably
+pub const trait ListLikeIterMut<T, Idx>: ListLike<T, Idx> {
+    /// The mutable iterator for the list type
+    type IteratorMut<'a>: Iterator<Item = &'a mut T>
+    where
+        Self: 'a,
+        T: 'a;
+
+    /// Iter over the held items mutably
+    fn iter_mut(&mut self) -> Self::IteratorMut<'_>;
+}
 /// A few helper functions for any list like object to reduce code duplication
 ///
 /// It is automatically implemented for all structs that implement [`ListLike`]
@@ -103,24 +126,28 @@ pub const trait ListLikeHelper<T, Idx> {
     fn reserve(&mut self, amount: usize);
 }
 
-impl<T> ListLike<T, usize> for Vec<T> {
+impl<T> ListLikeIter<T, usize> for Vec<T> {
     type Iterator<'a>
         = std::slice::Iter<'a, T>
-    where
-        T: 'a;
-
-    type IteratorMut<'a>
-        = std::slice::IterMut<'a, T>
     where
         T: 'a;
 
     fn iter(&self) -> Self::Iterator<'_> {
         self.as_slice().iter()
     }
+}
+impl<T> ListLikeIterMut<T, usize> for Vec<T> {
+    type IteratorMut<'a>
+        = std::slice::IterMut<'a, T>
+    where
+        T: 'a;
 
     fn iter_mut(&mut self) -> Self::IteratorMut<'_> {
         self.as_mut_slice().iter_mut()
     }
+}
+
+impl<T> ListLike<T, usize> for Vec<T> {
     unsafe fn get_unchecked(&self, index: usize) -> &T {
         unsafe { self.as_slice().get_unchecked(index) }
     }
@@ -145,11 +172,7 @@ impl<T> ListLike<T, usize> for Vec<T> {
     default fn len(&self) -> usize {
         self.len()
     }
-    default fn try_insert_mut(
-        &mut self,
-        index: usize,
-        value: T,
-    ) -> Option<&mut T> {
+    default fn try_insert_mut(&mut self, index: usize, value: T) -> Option<&mut T> {
         if index > self.len() {
             return None;
         }
@@ -186,9 +209,9 @@ impl<T> ListLike<T, usize> for Vec<T> {
 }
 // TODO: Merge [`ListLikeHelper`] into [`ListLike`]
 impl<S: ListLike<T, Idx>, T, Idx> ListLikeHelper<T, Idx> for S
-where
-    for<'a> &'a Self: IntoIterator,
-    for<'a> &'a mut Self: IntoIterator,
+// where
+//     for<'a> &'a Self: IntoIterator,
+//     for<'a> &'a mut Self: IntoIterator,
 {
     fn push(&mut self, value: T) {
         self.push_mut(value);

@@ -14,6 +14,7 @@
 #![feature(const_ops)]
 #![feature(const_cmp)]
 #![feature(const_destruct)]
+#![feature(const_convert)]
 
 mod macros;
 
