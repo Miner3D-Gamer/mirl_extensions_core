@@ -1,25 +1,24 @@
 use crate::SupportsNegative;
 
-/// The evil version of [`ConstOne`]
-pub trait ConstNegativeOne {
+/// The evil version of [`One`]
+pub const trait NegativeOne {
     /// The value of -1 for the respective type
-    const NEGATIVE_ONE: Self;
+    fn negative_one() -> Self;
 }
-impl<T: ConstOne + ConstZero + SupportsNegative + const core::ops::Sub<Output = T>> ConstNegativeOne
-    for T
+const impl<T: [const] One + [const] Zero + SupportsNegative + [const] core::ops::Sub<Output = T>>
+    NegativeOne for T
 {
-    const NEGATIVE_ONE: Self = Self::ZERO - Self::ONE;
+    fn negative_one() -> Self {
+        Self::zero() - Self::one()
+    }
 }
 
-/// A custom [`ConstOne`] as [num-traits](crate::math::ConstOne) does not support f16 or f128
-pub trait ConstOne {
-    /// The value of 1 in the respective type
-    const ONE: Self;
-}
 macro_rules! impl_const_one {
     ($t:ty, $v:expr) => {
-        impl ConstOne for $t {
-            const ONE: Self = $v;
+        const impl One for $t {
+            fn one() -> Self {
+                $v
+            }
         }
     };
 }
@@ -43,15 +42,12 @@ impl_const_one!(f32, 1.0);
 impl_const_one!(f64, 1.0);
 impl_const_one!(f128, 1.0);
 
-/// A custom [`ConstZero`] as [num-traits](crate::math::ConstZero) does not support f16 or f128
-pub const trait ConstZero {
-    /// The value of 0 in the respective type
-    const ZERO: Self;
-}
 macro_rules! impl_const_zero {
     ($t:ty, $v:expr) => {
-        impl ConstZero for $t {
-            const ZERO: Self = $v;
+        const impl Zero for $t {
+            fn zero() -> Self {
+                $v
+            }
         }
     };
 }
@@ -85,16 +81,6 @@ pub const trait One {
 pub const trait Zero {
     /// The value of 1 in the respective type
     fn zero() -> Self;
-}
-const impl<T: ConstOne> One for T {
-    fn one() -> Self {
-        Self::ONE
-    }
-}
-const impl<T: ConstZero> Zero for T {
-    fn zero() -> Self {
-        Self::ZERO
-    }
 }
 
 /// The upper and lower bound of a value

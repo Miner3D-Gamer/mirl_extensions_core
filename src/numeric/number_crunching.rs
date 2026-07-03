@@ -32,16 +32,16 @@ pub const trait SetOne {
     /// Set the current value to 1
     fn set_one(&mut self);
 }
-const impl<T: ConstZero + [const] core::marker::Destruct> SetZero for T {
+const impl<T: [const] Zero + [const] core::marker::Destruct> SetZero for T {
     #[inline(always)]
     fn set_zero(&mut self) {
-        *self = Self::ZERO;
+        *self = Self::zero();
     }
 }
-const impl<T: ConstOne + [const] core::marker::Destruct> SetOne for T {
+const impl<T: [const] One + [const] core::marker::Destruct> SetOne for T {
     #[inline(always)]
     fn set_one(&mut self) {
-        *self = Self::ONE;
+        *self = Self::one();
     }
 }
 /// Check if the value is zero
@@ -63,15 +63,22 @@ pub const trait Sign {
     fn sign(self) -> Self;
 }
 
-impl<T: ConstNegativeOne + ConstZero + ConstOne + PartialOrd> Sign for T {
+const impl<
+    T: [const] NegativeOne
+        + [const] Zero
+        + [const] One
+        + [const] PartialOrd
+        + [const] core::marker::Destruct,
+> Sign for T
+{
     #[inline(always)]
     default fn sign(self) -> Self {
-        if self > Self::ZERO {
-            Self::ONE
-        } else if self < Self::ZERO {
-            Self::NEGATIVE_ONE
+        if self > Self::zero() {
+            Self::one()
+        } else if self < Self::zero() {
+            Self::negative_one()
         } else {
-            Self::ZERO
+            Self::zero()
         }
     }
 }

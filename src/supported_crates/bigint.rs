@@ -1,7 +1,9 @@
-use crate::{ConstZero, One};
+use crate::{One, Zero};
 
-impl ConstZero for num_bigint::BigInt {
-    const ZERO: Self = Self::ZERO;
+const impl Zero for num_bigint::BigInt {
+    fn zero() -> Self {
+        Self::ZERO
+    }
 }
 impl One for num_bigint::BigInt {
     fn one() -> Self {
@@ -9,9 +11,12 @@ impl One for num_bigint::BigInt {
     }
 }
 
-impl ConstZero for num_bigint::BigUint {
-    const ZERO: Self = Self::ZERO;
+const impl Zero for num_bigint::BigUint {
+    fn zero() -> Self {
+        Self::ZERO
+    }
 }
+
 impl One for num_bigint::BigUint {
     fn one() -> Self {
         Self::new(vec![1])
