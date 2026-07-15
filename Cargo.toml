@@ -7,7 +7,7 @@ repository.workspace = true
 [features]
 default = ["std"]
 #### Core
-std = []
+std = ["indexmap?/std", "num-bigfloat?/std", "num-bigint?/std", "num-traits?/std"]
 all = ["indexmap", "dashmap", "masstree", "bigint", "bigfloat"]
 # Compatibility with ffi
 c_compatible = []

@@ -85,8 +85,9 @@ const impl<
 
 macro_rules! impl_sign_u {
     ($($t:ty),*) => {
-        // See those two spaces between the `const` and `Sign`?
-        $(impl const  Sign for $t {
+        // Are those two spaces between the `const` and `Sign`?
+        // Are those three spaces after the syntax change?
+        $(const impl   $crate::Sign for $t {
             #[inline(always)]
             fn sign(self) -> Self {
                 if self > 0 { 1  }
